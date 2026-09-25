@@ -20,9 +20,9 @@
     ] }
   ];
   const levels = [
-    { color: 'green', name: 'Разминка', bars: 1 },
-    { color: 'peach', name: 'Посложнее', bars: 2 },
-    { color: 'pink', name: 'Вызов', bars: 3 }
+    { name: 'Разминка', bars: 1 },
+    { name: 'Посложнее', bars: 2 },
+    { name: 'Вызов', bars: 3 }
   ];
   const questions = categories.flatMap((category, col) => category.questions.map((text, row) => ({
     id: `${category.id}-${row + 1}`, category, level: levels[row], text,
@@ -70,7 +70,7 @@
 
   function card(question) {
     const answered = completed.has(question.id);
-    return `<button class="question-card ${question.level.color}${answered ? ' is-complete' : ''}" data-question="${question.id}" aria-label="${question.category.title}. ${question.level.name}. Вопрос ${question.number}. ${answered ? 'Обсудили. Открыть снова.' : question.teaser}">
+    return `<button class="question-card${answered ? ' is-complete' : ''}" data-question="${question.id}" aria-label="${question.category.title}. ${question.level.name}. Вопрос ${question.number}. ${answered ? 'Обсудили. Открыть снова.' : question.teaser}">
       <span class="card-top"><span class="difficulty">${bars(question.level)}${question.level.name}</span>${answered ? '<span class="card-status">Обсудили</span>' : ''}</span>
       <span class="card-bottom"><span class="card-number" aria-hidden="true">${question.number}</span><span class="card-teaser">${question.teaser}</span><span class="card-action">${answered ? check : arrow}</span></span>
     </button>`;
@@ -96,7 +96,7 @@
     const parts = question.text.split(' — ');
     main.innerHTML = `<section class="question-view stage" aria-labelledby="question-title">
       <div class="question-nav"><button class="back-button" data-action="back">${backArrow}<span>К вопросам</span></button><span class="question-category">${question.category.title}</span><span class="question-counter">Вопрос ${question.number} <span>/ 09</span></span></div>
-      <div class="question-panel ${question.level.color}">
+      <div class="question-panel">
         <div class="question-panel-top"><span class="question-level">${bars(question.level)}${question.level.name}</span>${answered ? '<span class="discussion-label">' + check + 'Обсудили</span>' : ''}</div>
         <h1 id="question-title" tabindex="-1"><span>${parts[0]}</span><span class="question-prompt"> — ${parts[1]}</span></h1>
         <span class="oversized-number" aria-hidden="true">${question.number}</span>
