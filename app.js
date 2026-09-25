@@ -20,9 +20,9 @@
     ] }
   ];
   const levels = [
-    { color: 'green', name: 'Разминка', colorName: 'Зелёный', bars: 1 },
-    { color: 'yellow', name: 'Посложнее', colorName: 'Жёлтый', bars: 2 },
-    { color: 'red', name: 'Вызов', colorName: 'Красный', bars: 3 }
+    { color: 'green', name: 'Разминка', bars: 1 },
+    { color: 'peach', name: 'Посложнее', bars: 2 },
+    { color: 'pink', name: 'Вызов', bars: 3 }
   ];
   const questions = categories.flatMap((category, col) => category.questions.map((text, row) => ({
     id: `${category.id}-${row + 1}`, category, level: levels[row], text,
@@ -71,7 +71,7 @@
   function card(question) {
     const answered = completed.has(question.id);
     return `<button class="question-card ${question.level.color}${answered ? ' is-complete' : ''}" data-question="${question.id}" aria-label="${question.category.title}. ${question.level.name}. Вопрос ${question.number}. ${answered ? 'Обсудили. Открыть снова.' : question.teaser}">
-      <span class="card-top"><span class="difficulty">${bars(question.level)}${question.level.name}</span><span class="card-status">${answered ? 'Обсудили' : `0${question.level.bars} / 03`}</span></span>
+      <span class="card-top"><span class="difficulty">${bars(question.level)}${question.level.name}</span>${answered ? '<span class="card-status">Обсудили</span>' : ''}</span>
       <span class="card-bottom"><span class="card-number" aria-hidden="true">${question.number}</span><span class="card-teaser">${question.teaser}</span><span class="card-action">${answered ? check : arrow}</span></span>
     </button>`;
   }
@@ -80,15 +80,14 @@
     const allDone = completed.size === questions.length;
     main.innerHTML = `<section class="board stage" aria-labelledby="board-title">
       <div class="board-heading">
-        <div><p class="eyebrow">3 темы <span>×</span> 3 уровня</p><h1 id="board-title" tabindex="-1">${allDone ? 'Всё обсудили!' : 'Выберите вопрос'}</h1></div>
+        <h1 id="board-title" tabindex="-1">${allDone ? 'Всё обсудили!' : 'Выберите вопрос'}</h1>
         <div class="progress" role="status" aria-label="Обсудили ${completed.size} из 9 вопросов">
           <span class="progress-label">Обсудили</span><div class="progress-numbers"><strong>${String(completed.size).padStart(2, '0')}</strong><span>/ 09</span></div>
           <div class="progress-track" aria-hidden="true">${Array.from({ length: 9 }, (_, i) => `<i class="${i < completed.size ? 'filled' : ''}"></i>`).join('')}</div>
         </div>
       </div>
-      <div class="question-grid">${categories.map((category, i) => `<section class="category" aria-labelledby="category-${category.id}"><div class="category-heading"><span class="category-index">0${i + 1}</span><h2 id="category-${category.id}">${category.lines}</h2></div>${questions.filter(q => q.category.id === category.id).map(card).join('')}</section>`).join('')}</div>
+      <div class="question-grid">${categories.map(category => `<section class="category" aria-labelledby="category-${category.id}"><div class="category-heading"><h2 id="category-${category.id}">${category.lines}</h2></div>${questions.filter(q => q.category.id === category.id).map(card).join('')}</section>`).join('')}</div>
     </section>`;
-    document.querySelector('#footer-hint').textContent = allDone ? 'Можно открыть любой вопрос ещё раз' : 'Выберите любую карточку';
     document.title = 'Авито · Вопросы для бизнеса';
   }
 
@@ -98,13 +97,12 @@
     main.innerHTML = `<section class="question-view stage" aria-labelledby="question-title">
       <div class="question-nav"><button class="back-button" data-action="back">${backArrow}<span>К вопросам</span></button><span class="question-category">${question.category.title}</span><span class="question-counter">Вопрос ${question.number} <span>/ 09</span></span></div>
       <div class="question-panel ${question.level.color}">
-        <div class="question-panel-top"><span class="question-level">${bars(question.level)}${question.level.name}</span><span class="question-level-caption">Уровень 0${question.level.bars} / 03</span></div>
+        <div class="question-panel-top"><span class="question-level">${bars(question.level)}${question.level.name}</span>${answered ? '<span class="discussion-label">' + check + 'Обсудили</span>' : ''}</div>
         <h1 id="question-title" tabindex="-1"><span>${parts[0]}</span><span class="question-prompt"> — ${parts[1]}</span></h1>
-        <div class="question-panel-bottom"><span class="discussion-label">${answered ? check + 'Уже обсудили' : 'Обсудим?'}</span><span class="oversized-number" aria-hidden="true">${question.number}</span></div>
+        <span class="oversized-number" aria-hidden="true">${question.number}</span>
       </div>
-      <div class="question-actions"><button class="skip-button" data-action="${answered ? 'undo' : 'back'}">${answered ? 'Снять отметку ответа' : 'Вернуться без отметки'}</button><button class="button answer-button" data-action="answer">${check}<span>${answered ? 'К вопросам' : 'Ответили · к вопросам'}</span></button></div>
+      <div class="question-actions">${answered ? '<button class="skip-button" data-action="undo">Снять отметку ответа</button>' : ''}<button class="button answer-button" data-action="answer">${check}<span>${answered ? 'К вопросам' : 'Ответили · к вопросам'}</span></button></div>
     </section>`;
-    document.querySelector('#footer-hint').textContent = 'Esc — к вопросам';
     document.title = `${question.category.title} · Авито`;
   }
 

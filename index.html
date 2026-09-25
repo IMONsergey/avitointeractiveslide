@@ -3,20 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#003914">
+  <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Девять вопросов о прибыли, продвижении и сделках. Интерактивная презентация Авито.">
   <title>Авито · Вопросы для бизнеса</title>
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
   <link rel="preload" href="./assets/fonts/CoFoAvitoDisplay-Regular.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="./assets/fonts/CoFoAvitoDisplay-Medium.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="./styles.css">
-  <script src="./app.js" defer></script>
+  <link rel="stylesheet" href="./styles.css?v=light-2">
+  <script src="./app.js?v=light-2" defer></script>
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a href="#" class="brand" aria-label="Авито — к вопросам"><img src="./assets/avito-logo.svg" width="142" height="36" alt="Авито"></a>
-      <span class="presentation-label">Вопросы для бизнеса</span>
+      <a href="#" class="brand" aria-label="Авито — к вопросам"><img src="./assets/avito-logo.svg?v=light-2" width="142" height="36" alt="Авито"></a>
       <div class="tools">
         <button class="tool-button" id="reset-button" aria-label="Начать заново" title="Начать заново" disabled>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9a8 8 0 1 1 0 6M4 4v5h5"/></svg><span>Начать заново</span>
@@ -27,14 +26,9 @@
       </div>
     </header>
     <main id="main-content"></main>
-    <footer class="footer">
-      <div class="legend" aria-label="Уровни сложности"><span><i class="green"></i>Разминка</span><span><i class="yellow"></i>Посложнее</span><span><i class="red"></i>Вызов</span></div>
-      <span class="footer-hint" id="footer-hint">Выберите любую карточку</span>
-    </footer>
   </div>
   <dialog id="reset-dialog" aria-labelledby="reset-title" aria-describedby="reset-description">
     <form method="dialog">
-      <span class="dialog-eyebrow">Новый раунд</span>
       <h2 id="reset-title">Начнём заново?</h2>
       <p id="reset-description">Все отметки ответов будут сняты.</p>
       <div class="dialog-actions"><button value="cancel" class="button button-secondary" autofocus>Продолжить</button><button value="reset" class="button button-primary">Сбросить отметки</button></div>
