@@ -86,13 +86,20 @@
     document.title = 'Авито · Предпринимательский блиц';
   }
 
+  function questionTypography(text) {
+    return text
+      // Keep short statements and prepositions together when a line wraps.
+      .replace(/(\S+) (есть|нет|мало)(?=[,?\s]|$)/gu, '$1\u00a0$2')
+      .replace(/(^|\s)(в|к|с|у|о|а|и|не|но|на|по|за|от|до|из|со|во) (?=\S)/giu, '$1$2\u00a0');
+  }
+
   function questionScreen(question) {
     const answered = completed.has(question.id);
     const parts = question.text.split(' — ');
     main.innerHTML = `<section class="question-view stage" aria-labelledby="question-title">
       <div class="question-nav"><button class="back-button" data-action="back">${backArrow}<span>К вопросам</span></button></div>
       <div class="question-panel" data-level="${question.level.bars}">
-        <h1 id="question-title" tabindex="-1"><span>${parts[0]}</span><span class="question-prompt"> — ${parts[1]}</span></h1>
+        <h1 id="question-title" tabindex="-1"><span class="question-lead">${questionTypography(parts[0])}<span class="question-prompt">&nbsp;—</span></span> <span class="question-prompt">${questionTypography(parts[1])}</span></h1>
       </div>
       <div class="question-actions">${answered ? '<button class="skip-button" data-action="undo">Снять отметку ответа</button>' : ''}<button class="button answer-button" data-action="answer">${check}<span>${answered ? 'К вопросам' : 'Ответили · к вопросам'}</span></button></div>
     </section>`;
