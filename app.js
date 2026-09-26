@@ -3,7 +3,7 @@
 
   // Тексты клиента. Порядок колонок и уровней задаётся только здесь.
   const categories = [
-    { id: 'money', title: 'Деньги любят счет', lines: 'Деньги<br> любят счет', questions: [
+    { id: 'money', title: 'Деньги любят счет', lines: 'Деньги любят<br> счет', questions: [
       'Выручка есть, прибыли нет — какие расходы забыли учесть?',
       'Скидка дала продажи, но съела прибыль — когда можно снижать цену, а когда держать маржу?',
       'Продаж стало больше, но выросли ошибки — что подготовить перед ростом продаж?'
@@ -26,7 +26,7 @@
   ];
   const questions = categories.flatMap((category, col) => category.questions.map((text, row) => ({
     id: `${category.id}-${row + 1}`, category, level: levels[row], text,
-    teaser: text.split(' — ')[0], number: String(row * 3 + col + 1).padStart(2, '0')
+    number: String(row * 3 + col + 1).padStart(2, '0')
   })));
   const byId = new Map(questions.map(question => [question.id, question]));
   const storageKey = 'avito-business-questions:v1';
@@ -64,15 +64,11 @@
     toastTimeout = setTimeout(() => toast.remove(), 3500);
   }
 
-  function bars(level) {
-    return `<span class="level-bars" aria-hidden="true">${[1, 2, 3].map(n => `<i class="${n <= level.bars ? 'on' : ''}"></i>`).join('')}</span>`;
-  }
-
   function card(question) {
     const answered = completed.has(question.id);
-    return `<button class="question-card${answered ? ' is-complete' : ''}" data-question="${question.id}" data-level="${question.level.bars}" aria-label="${question.category.title}. ${question.level.name}. Вопрос ${question.number}. ${answered ? 'Обсудили. Открыть снова.' : question.teaser}">
-      <span class="card-top"><span class="difficulty">${bars(question.level)}${question.level.name}</span>${answered ? '<span class="card-status">Обсудили</span>' : ''}</span>
-      <span class="card-bottom"><span class="card-number" aria-hidden="true">${question.number}</span><span class="card-teaser">${question.teaser}</span><span class="card-action">${answered ? check : arrow}</span></span>
+    return `<button class="question-card${answered ? ' is-complete' : ''}" data-question="${question.id}" data-level="${question.level.bars}" aria-label="${question.category.title}. ${question.level.name}. ${answered ? 'Обсудили. Открыть снова.' : 'Открыть вопрос.'}">
+      <span class="difficulty">${question.level.name}</span>
+      <span class="card-action" aria-hidden="true">${answered ? check : arrow}</span>
     </button>`;
   }
 
@@ -83,23 +79,20 @@
         <h1 id="board-title" tabindex="-1">${allDone ? 'Всё обсудили!' : 'Выберите вопрос'}</h1>
         <div class="progress" role="status" aria-label="Обсудили ${completed.size} из 9 вопросов">
           <span class="progress-label">Обсудили</span><div class="progress-numbers"><strong>${String(completed.size).padStart(2, '0')}</strong><span>/ 09</span></div>
-          <div class="progress-track" aria-hidden="true">${Array.from({ length: 9 }, (_, i) => `<i class="${i < completed.size ? 'filled' : ''}"></i>`).join('')}</div>
         </div>
       </div>
       <div class="question-grid">${categories.map(category => `<section class="category" aria-labelledby="category-${category.id}"><div class="category-heading"><h2 id="category-${category.id}">${category.lines}</h2></div>${questions.filter(q => q.category.id === category.id).map(card).join('')}</section>`).join('')}</div>
     </section>`;
-    document.title = 'Авито · Вопросы для бизнеса';
+    document.title = 'Авито · Предпринимательский блиц';
   }
 
   function questionScreen(question) {
     const answered = completed.has(question.id);
     const parts = question.text.split(' — ');
     main.innerHTML = `<section class="question-view stage" aria-labelledby="question-title">
-      <div class="question-nav"><button class="back-button" data-action="back">${backArrow}<span>К вопросам</span></button><span class="question-category">${question.category.title}</span><span class="question-counter">Вопрос ${question.number} <span>/ 09</span></span></div>
+      <div class="question-nav"><button class="back-button" data-action="back">${backArrow}<span>К вопросам</span></button></div>
       <div class="question-panel" data-level="${question.level.bars}">
-        <div class="question-panel-top"><span class="question-level">${bars(question.level)}${question.level.name}</span>${answered ? '<span class="discussion-label">' + check + 'Обсудили</span>' : ''}</div>
         <h1 id="question-title" tabindex="-1"><span>${parts[0]}</span><span class="question-prompt"> — ${parts[1]}</span></h1>
-        <span class="oversized-number" aria-hidden="true">${question.number}</span>
       </div>
       <div class="question-actions">${answered ? '<button class="skip-button" data-action="undo">Снять отметку ответа</button>' : ''}<button class="button answer-button" data-action="answer">${check}<span>${answered ? 'К вопросам' : 'Ответили · к вопросам'}</span></button></div>
     </section>`;
