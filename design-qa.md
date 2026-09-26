@@ -39,3 +39,9 @@ Desktop presentation was visually verified. Mobile layout retains a single-colum
 ## Copy follow-up — 26 September 2026
 
 Reviewed all nine questions for ё. Only category spellings required correction: «Деньги любят счёт» and «Куда ушёл бюджет». Browser verification confirmed both visible headings and all six associated card accessible names. The full-view evidence in `docs/preview.jpg` was refreshed; the earlier question/answered captures document the interaction check before this copy-only correction. Final result remains passed.
+
+## Typography follow-up — 26 September 2026
+
+Applied the client’s two question-layout comments: the introductory clause ends with a nonbreaking em dash, and the question prompt starts on its own line. Short statements such as «продаж нет» and «заявок мало», together with short prepositions/conjunctions, use nonbreaking spaces. All nine original question strings remain unchanged.
+
+Verified all nine question screens on the live `type-8` deployment at 1363 × 936: all texts render with the intended nonbreaking spaces and no horizontal page overflow. Visually checked the longest question and both affected budget questions. Refreshed `docs/question-preview.jpg` with the corrected pink question. Mobile viewport was not separately captured.
