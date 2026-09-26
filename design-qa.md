@@ -35,3 +35,7 @@ Console checked: no application-origin errors observed; browser extension metada
 First comparison after applying the requested changes: passed; no additional visual fixes required. Expected differences from the client's rough mock: no large category numbers (explicit user instruction), no repeated per-card counters or decorative corners (simplification), responsive card height and existing original font files.
 
 Desktop presentation was visually verified. Mobile layout retains a single-column media query; this pass did not include a separate mobile browser capture.
+
+## Copy follow-up — 26 September 2026
+
+Reviewed all nine questions for ё. Only category spellings required correction: «Деньги любят счёт» and «Куда ушёл бюджет». Browser verification confirmed both visible headings and all six associated card accessible names. The full-view evidence in `docs/preview.jpg` was refreshed; the earlier question/answered captures document the interaction check before this copy-only correction. Final result remains passed.
