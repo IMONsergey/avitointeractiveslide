@@ -35,7 +35,6 @@
   const main = document.querySelector('#main-content');
   const resetButton = document.querySelector('#reset-button');
   const resetDialog = document.querySelector('#reset-dialog');
-  const fullscreenButton = document.querySelector('#fullscreen-button');
   const announcement = document.querySelector('#announcement');
   const check = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>';
   let completed = readProgress();
@@ -76,9 +75,9 @@
     const allDone = completed.size === questions.length;
     main.innerHTML = `<section class="board stage" aria-labelledby="board-title">
       <div class="board-heading">
-        <div class="board-title-group"><h1 id="board-title" tabindex="-1">${allDone ? 'Всё обсудили!' : 'Выберите вопрос'}</h1><p class="board-shortcut">Нажмите цифру 1–9 на клавиатуре</p></div>
-        <div class="progress" role="status" aria-label="Обсудили ${completed.size} из 9 вопросов">
-          <span class="progress-label">Обсудили</span><div class="progress-numbers"><strong>${String(completed.size).padStart(2, '0')}</strong><span>/ 09</span></div>
+        <h1 id="board-title" tabindex="-1">${allDone ? 'Готово' : 'Выберите вопрос'}</h1>
+        <div class="progress" role="status" aria-label="${completed.size} из 9 вопросов">
+          <div class="progress-numbers"><strong>${String(completed.size).padStart(2, '0')}</strong><span>/ 09</span></div>
         </div>
       </div>
       <div class="question-grid">${categories.map(category => `<section class="category" aria-labelledby="category-${category.id}"><div class="category-heading"><h2 id="category-${category.id}">${category.lines}</h2></div>${questions.filter(q => q.category.id === category.id).map(card).join('')}</section>`).join('')}</div>
@@ -166,14 +165,6 @@
       else await document.documentElement.requestFullscreen();
     } catch { notify('Не удалось открыть полный экран. Используйте полноэкранный режим браузера.'); }
   }
-  if (!document.fullscreenEnabled) fullscreenButton.hidden = true;
-  fullscreenButton.addEventListener('click', toggleFullscreen);
-  document.addEventListener('fullscreenchange', () => {
-    const label = document.fullscreenElement ? 'Свернуть экран' : 'На весь экран';
-    fullscreenButton.setAttribute('aria-label', label);
-    fullscreenButton.title = `${label} (F)`;
-    fullscreenButton.querySelector('span').textContent = label;
-  });
   document.addEventListener('keydown', event => {
     if (resetDialog.open || event.altKey || event.ctrlKey || event.metaKey || event.repeat || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
     if (event.key === 'Escape' && activeQuestion) { event.preventDefault(); returnToBoard(); return; }
