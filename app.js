@@ -26,18 +26,18 @@
   ];
   const questions = categories.flatMap((category, col) => category.questions.map((text, row) => ({
     id: `${category.id}-${row + 1}`, category, level: levels[row], text,
+    key: String(row * 3 + col + 1),
     number: String(row * 3 + col + 1).padStart(2, '0')
   })));
   const byId = new Map(questions.map(question => [question.id, question]));
+  const byKey = new Map(questions.map(question => [question.key, question]));
   const storageKey = 'avito-business-questions:v1';
   const main = document.querySelector('#main-content');
   const resetButton = document.querySelector('#reset-button');
   const resetDialog = document.querySelector('#reset-dialog');
   const fullscreenButton = document.querySelector('#fullscreen-button');
   const announcement = document.querySelector('#announcement');
-  const arrow = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg>';
   const check = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>';
-  const backArrow = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5-7 7 7 7M3 12h18"/></svg>';
   let completed = readProgress();
   let lastQuestion = null;
   let activeQuestion = null;
@@ -66,9 +66,9 @@
 
   function card(question) {
     const answered = completed.has(question.id);
-    return `<button class="question-card${answered ? ' is-complete' : ''}" data-question="${question.id}" data-level="${question.level.bars}" aria-label="${question.category.title}. ${question.level.name}. ${answered ? 'Обсудили. Открыть снова.' : 'Открыть вопрос.'}">
+    return `<button class="question-card${answered ? ' is-complete' : ''}" data-question="${question.id}" data-level="${question.level.bars}" aria-keyshortcuts="${question.key}" aria-label="Вопрос ${question.key}. ${question.category.title}. ${question.level.name}. ${answered ? 'Уже открывали.' : 'Нажмите ' + question.key + ' на клавиатуре, чтобы открыть.'}">
       <span class="difficulty">${question.level.name}</span>
-      <span class="card-action" aria-hidden="true">${answered ? check : arrow}</span>
+      <span class="card-footer" aria-hidden="true"><span class="card-number">${question.key}</span><span class="card-action${answered ? '' : ' is-hidden'}">${answered ? check : ''}</span></span>
     </button>`;
   }
 
@@ -76,7 +76,7 @@
     const allDone = completed.size === questions.length;
     main.innerHTML = `<section class="board stage" aria-labelledby="board-title">
       <div class="board-heading">
-        <h1 id="board-title" tabindex="-1">${allDone ? 'Всё обсудили!' : 'Выберите вопрос'}</h1>
+        <div class="board-title-group"><h1 id="board-title" tabindex="-1">${allDone ? 'Всё обсудили!' : 'Выберите вопрос'}</h1><p class="board-shortcut">Нажмите цифру 1–9 на клавиатуре</p></div>
         <div class="progress" role="status" aria-label="Обсудили ${completed.size} из 9 вопросов">
           <span class="progress-label">Обсудили</span><div class="progress-numbers"><strong>${String(completed.size).padStart(2, '0')}</strong><span>/ 09</span></div>
         </div>
@@ -94,14 +94,12 @@
   }
 
   function questionScreen(question) {
-    const answered = completed.has(question.id);
     const parts = question.text.split(' — ');
     main.innerHTML = `<section class="question-view stage" aria-labelledby="question-title">
-      <div class="question-nav"><button class="back-button" data-action="back">${backArrow}<span>К вопросам</span></button></div>
       <div class="question-panel" data-level="${question.level.bars}">
         <h1 id="question-title" tabindex="-1"><span class="question-lead">${questionTypography(parts[0])}<span class="question-prompt">&nbsp;—</span></span> <span class="question-prompt">${questionTypography(parts[1])}</span></h1>
       </div>
-      <div class="question-actions">${answered ? '<button class="skip-button" data-action="undo">Снять отметку ответа</button>' : ''}<button class="button answer-button" data-action="answer">${check}<span>${answered ? 'К вопросам' : 'Ответили · к вопросам'}</span></button></div>
+      <div class="question-footer" aria-label="Управление с клавиатуры"><span>Вопрос ${question.key}</span><span><kbd>Esc</kbd> К вопросам</span></div>
     </section>`;
     document.title = `${question.category.title} · Авито`;
   }
@@ -109,7 +107,7 @@
   function render(focus = false) {
     const id = location.hash.startsWith('#question/') ? location.hash.slice(10) : null;
     activeQuestion = byId.get(id) || null;
-    if (activeQuestion) questionScreen(activeQuestion); else board();
+    if (activeQuestion) { markAnswered(activeQuestion); questionScreen(activeQuestion); } else board();
     document.body.classList.toggle('showing-question', Boolean(activeQuestion));
     resetButton.disabled = completed.size === 0;
     if (focus) {
@@ -118,14 +116,25 @@
     }
   }
 
-  function returnToBoard(markAnswered) {
+  function markAnswered(question) {
+    if (!question || completed.has(question.id)) return;
+    completed.add(question.id);
+    saveProgress();
+    announcement.textContent = `Вопрос ${question.number} открыт. Всего ${completed.size} из 9.`;
+  }
+
+  function openQuestion(question) {
+    if (!question) return;
+    lastQuestion = question.id;
+    markAnswered(question);
+    const nextHash = `#question/${question.id}`;
+    if (location.hash === nextHash) render(true);
+    else location.hash = nextHash;
+  }
+
+  function returnToBoard() {
     if (!activeQuestion) return;
     lastQuestion = activeQuestion.id;
-    if (markAnswered) {
-      completed.add(activeQuestion.id);
-      saveProgress();
-      announcement.textContent = `Вопрос ${activeQuestion.number} обсудили. Всего ${completed.size} из 9.`;
-    }
     history.replaceState(null, '', location.pathname + location.search);
     render(true);
   }
@@ -133,19 +142,7 @@
   main.addEventListener('click', event => {
     const button = event.target.closest('button');
     if (!button) return;
-    if (button.dataset.question) {
-      lastQuestion = button.dataset.question;
-      location.hash = `question/${lastQuestion}`;
-      return;
-    }
-    if (button.dataset.action === 'answer') returnToBoard(true);
-    if (button.dataset.action === 'back') returnToBoard(false);
-    if (button.dataset.action === 'undo' && activeQuestion) {
-      completed.delete(activeQuestion.id);
-      saveProgress();
-      returnToBoard(false);
-      announcement.textContent = 'Отметка ответа снята.';
-    }
+    if (button.dataset.question) openQuestion(byId.get(button.dataset.question));
   });
 
   resetButton.addEventListener('click', () => { resetDialog.returnValue = ''; resetDialog.showModal(); });
@@ -180,8 +177,12 @@
   });
   document.addEventListener('keydown', event => {
     if (resetDialog.open || event.altKey || event.ctrlKey || event.metaKey || event.repeat || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
-    if (event.key === 'Escape' && activeQuestion) { event.preventDefault(); returnToBoard(false); }
-    if (event.code === 'KeyF' && document.fullscreenEnabled) { event.preventDefault(); toggleFullscreen(); }
+    if (event.key === 'Escape' && activeQuestion) { event.preventDefault(); returnToBoard(); return; }
+    if (event.code === 'KeyF' && document.fullscreenEnabled) { event.preventDefault(); toggleFullscreen(); return; }
+    if (!activeQuestion) {
+      const match = event.code.match(/^(?:Digit|Numpad)([1-9])$/);
+      if (match) { event.preventDefault(); openQuestion(byKey.get(match[1])); }
+    }
   });
   window.addEventListener('hashchange', () => render(true));
   window.addEventListener('storage', event => { if (event.key === storageKey || event.key === null) { completed = readProgress(); render(); } });
