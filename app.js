@@ -159,12 +159,31 @@
     announcement.textContent = 'Новый раунд. Все девять вопросов доступны.';
   });
 
+  async function lockEscapeInFullscreen() {
+    if (!navigator.keyboard?.lock || !document.fullscreenElement) return;
+    try { await navigator.keyboard.lock(['Escape']); } catch {}
+  }
+
+  function unlockPresentationKeys() {
+    try { navigator.keyboard?.unlock?.(); } catch {}
+  }
+
   async function toggleFullscreen() {
     try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else await document.documentElement.requestFullscreen();
+      if (document.fullscreenElement) {
+        unlockPresentationKeys();
+        await document.exitFullscreen();
+      } else {
+        await document.documentElement.requestFullscreen();
+        await lockEscapeInFullscreen();
+      }
     } catch { notify('Не удалось открыть полный экран. Используйте полноэкранный режим браузера.'); }
   }
+
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) lockEscapeInFullscreen();
+    else unlockPresentationKeys();
+  });
   document.addEventListener('keydown', event => {
     if (resetDialog.open || event.altKey || event.ctrlKey || event.metaKey || event.repeat || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
     if (event.key === 'Escape' && activeQuestion) { event.preventDefault(); returnToBoard(); return; }
