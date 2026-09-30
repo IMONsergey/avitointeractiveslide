@@ -68,7 +68,7 @@
     const answered = completed.has(question.id);
     return `<button class="question-card${answered ? ' is-complete' : ''}" data-question="${question.id}" data-level="${question.level.bars}" aria-keyshortcuts="${question.key}" aria-label="Вопрос ${question.key}. ${question.category.title}. ${question.level.name}. ${answered ? 'Уже открывали.' : 'Нажмите ' + question.key + ' на клавиатуре, чтобы открыть.'}">
       <span class="difficulty">${question.level.name}</span>
-      <span class="card-footer" aria-hidden="true"><span class="card-number">${question.key}</span><span class="card-action${answered ? '' : ' is-hidden'}">${answered ? check : ''}</span></span>
+      <span class="card-footer" aria-hidden="true"><span class="card-number">${question.key}</span></span>
     </button>`;
   }
 
