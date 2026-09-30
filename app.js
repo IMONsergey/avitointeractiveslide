@@ -99,7 +99,6 @@
       <div class="question-panel" data-level="${question.level.bars}">
         <h1 id="question-title" tabindex="-1"><span class="question-lead">${questionTypography(parts[0])}<span class="question-prompt">&nbsp;—</span></span> <span class="question-prompt">${questionTypography(parts[1])}</span></h1>
       </div>
-      <div class="question-footer" aria-label="Управление с клавиатуры"><span>Вопрос ${question.key}</span><span><kbd>Esc</kbd> К вопросам</span></div>
     </section>`;
     document.title = `${question.category.title} · Авито`;
   }
